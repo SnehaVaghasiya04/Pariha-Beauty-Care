@@ -1,0 +1,53 @@
+<?php
+// Database connection
+include 'conn.php';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $description = $_POST['description'];
+    $role = $_POST['role'];
+
+    // Handling image upload
+    $image = $_FILES['image']['name'];
+    $target_dir = "uploads/";
+    $target_file = $target_dir . basename($image);
+
+    // Move uploaded file
+    if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+        // Insert into the database
+        $sql = "INSERT INTO team (name, description, role, image) VALUES ('$name', '$description', '$role', '$image')";
+        if ($conn->query($sql) === TRUE) {
+            echo "New team member added successfully!";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    } else {
+        echo "Failed to upload image.";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Team Member</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { width: 300px; margin: 50px auto; }
+        input, textarea { width: 100%; margin: 10px 0; padding: 10px; }
+        button { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <h2>Add Team Member</h2>
+    <form action="admin_add_team.php" method="post" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Name" required>
+        <textarea name="description" placeholder="Description" required></textarea>
+        <input type="text" name="role" placeholder="Role" required>
+        <input type="file" name="image" required>
+        <button type="submit">Add Team Member</button>
+    </form>
+</body>
+</html>
